@@ -1,40 +1,50 @@
 public class Tarefa {
     private int id;
+    private int status_id;
     private String descricao;
-    private boolean concluido;
+    private String nome_prioridade;
+
+    public int getId() {
+        return id;
+    }
 
     // Construtor que aceita apenas a descrição da tarefa
     public Tarefa(String descricao) {
         this.descricao = descricao;
-        this.concluido = false; // Por padrão, uma nova tarefa não está concluída
-    }
-
-    public int getId() {
-        return id;
+        this.status_id = 1; // Por padrão, uma nova tarefa não está concluída
     }
 
     public String getDescricao() {
         return descricao;
     }
 
-    public boolean estaConcluido() {
-        return concluido;
-    }
-
     public void setDescricao(String descricao) {
         this.descricao = descricao;
     }
 
-    public void setConcluido(boolean concluido) {
-        this.concluido = concluido;
+    public int getStatus() {
+        return status_id;
+    }
+
+    public void setStatus(int status_id) {
+        this.status_id = status_id;
+    }
+
+    public String getPrioridade() {
+        return nome_prioridade;
+    }
+
+    public void setPrioridade(String nome_prioridade) {
+        this.nome_prioridade = nome_prioridade;
     }
 
     @Override
     public String toString() {
         return "Tarefa{" +
                 "id=" + id +
+                "status=" + status_id +
+                "prioridade=" + nome_prioridade +
                 ", descricao='" + descricao + '\'' +
-                ", concluido=" + concluido +
                 '}';
     }
 }

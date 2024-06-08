@@ -17,21 +17,15 @@ public class Main {
                     adicionarTarefa();
                     break;
                 case 2:
-                    marcarTarefaComoConcluida();
-                    break;
-                case 3:
-                    marcarTarefaComoNaoConcluida();
-                    break;
-                case 4:
                     alterarTarefa();
                     break;
-                case 5:
+                case 3:
                     removerTarefa();
                     break;
-                case 6:
+                case 4:
                     imprimirTarefas();
                     break;
-                case 7:
+                case 5:
                     sair = true;
                     break;
                 default:
@@ -45,12 +39,10 @@ public class Main {
     private static void imprimirMenu() {
         System.out.println("\n===== Lista de Tarefas =====");
         System.out.println("1. Adicionar tarefa");
-        System.out.println("2. Marcar tarefa como concluída");
-        System.out.println("3. Marcar tarefa como pendente");
-        System.out.println("4. Alterar tarefa");
-        System.out.println("5. Remover tarefa");
-        System.out.println("6. Exibir tarefas");
-        System.out.println("7. Sair");
+        System.out.println("2. Alterar tarefa");
+        System.out.println("3. Remover tarefa");
+        System.out.println("4. Consultar tarefas");
+        System.out.println("5. Sair");
         System.out.print("Escolha uma opção: ");
     }
 
@@ -60,7 +52,7 @@ public class Main {
 
     private static void adicionarTarefa() {
         System.out.print("Digite a descrição da tarefa: ");
-        scanner.nextLine(); // Consumir a nova linha pendente após a leitura do número
+        scanner.nextLine();
         String descricao = scanner.nextLine();
 
         Tarefa tarefa = new Tarefa(descricao);
@@ -71,34 +63,12 @@ public class Main {
         }
     }
 
-    private static void marcarTarefaComoConcluida() {
-        System.out.print("Digite o número da tarefa a ser marcada como concluída: ");
-        int numeroDaTarefa = scanner.nextInt();
-
-        if (listaDeAfazeres.marcarTarefaComoConcluida(numeroDaTarefa)) {
-            System.out.println("\nTarefa marcada como concluída!");
-        } else {
-            System.out.println("\nErro ao marcar a tarefa como concluída.");
-        }
-    }
-
-    private static void marcarTarefaComoNaoConcluida() {
-        System.out.print("Digite o número da tarefa a ser marcada como pendente: ");
-        int numeroDaTarefa = scanner.nextInt();
-
-        if (listaDeAfazeres.marcarTarefaComoNaoConcluida(numeroDaTarefa)) {
-            System.out.println("\nTarefa marcada como pendente!");
-        } else {
-            System.out.println("\nErro ao marcar a tarefa como pendente.");
-        }
-    }
-
     private static void alterarTarefa() {
         System.out.print("Digite o número da tarefa a ser alterada: ");
         int numeroDaTarefa = scanner.nextInt();
 
         System.out.print("Digite a nova descrição da tarefa: ");
-        scanner.nextLine(); // Consumir a nova linha pendente após a leitura do número
+        scanner.nextLine();
         String novaDescricao = scanner.nextLine();
 
         Tarefa novaTarefa = new Tarefa(novaDescricao);

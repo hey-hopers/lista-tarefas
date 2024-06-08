@@ -4,29 +4,31 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class Conexao {
-    private static final String URL = "jdbc:mysql://localhost:3306/seu_banco_de_dados";
-    private static final String USUARIO = "seu_usuario";
-    private static final String SENHA = "sua_senha";
 
-    private Connection conexao;
+    Connection conn = null;
 
-    public Conexao() {
+    public Connection ConexaoDB() {
+        
         try {
-            conexao = DriverManager.getConnection(URL, USUARIO, SENHA);
+            conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/db_lista_tarefa?user=root&password=admin");
             System.out.println("Conexão estabelecida com sucesso.");
+            
         } catch (SQLException e) {
             System.out.println("Erro ao conectar ao banco de dados: " + e.getMessage());
         }
+
+        return conn;
+
     }
 
     public PreparedStatement prepararDeclaracao(String sql) throws SQLException {
-        return conexao.prepareStatement(sql);
+        return conn.prepareStatement(sql);
     }
 
     public void fecharConexao() {
-        if (conexao != null) {
+        if (conn != null) {
             try {
-                conexao.close();
+                conn.close();
                 System.out.println("Conexão fechada com sucesso.");
             } catch (SQLException e) {
                 System.out.println("Erro ao fechar a conexão com o banco de dados: " + e.getMessage());
