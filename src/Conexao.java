@@ -11,7 +11,6 @@ public class Conexao {
         
         try {
             conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/db_lista_tarefa?user=root&password=admin");
-            System.out.println("Conexão estabelecida com sucesso.");
             
         } catch (SQLException e) {
             System.out.println("Erro ao conectar ao banco de dados: " + e.getMessage());
