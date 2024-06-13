@@ -1,6 +1,11 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
-import java.sql.Timestamp;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Vector;
 
 public class Main {
     private static ListaDeAfazeres listaDeAfazeres = new ListaDeAfazeres();
@@ -22,17 +27,9 @@ public class Main {
         JButton btnAdd = new JButton("Adicionar Tarefa");
         btnAdd.addActionListener(e -> adicionarTarefa());
 
-        // Botão para alterar tarefa
-        JButton btnAlter = new JButton("Alterar Tarefa");
-        btnAlter.addActionListener(e -> alterarTarefa());
-
-        // Botão para remover tarefa
-        JButton btnRemove = new JButton("Remover Tarefa");
-        btnRemove.addActionListener(e -> removerTarefa());
-
         // Botão para consultar tarefas
-        JButton btnPrint = new JButton("Consultar Tarefas");
-        /* btnPrint.addActionListener(e -> imprimirTarefas()); */
+        JButton btnFind = new JButton("Consultar Tarefas");
+        btnFind.addActionListener(e -> consultarTarefa());
 
         // Botão para sair
         JButton btnExit = new JButton("Sair");
@@ -45,11 +42,7 @@ public class Main {
         gbc.anchor = GridBagConstraints.CENTER;
         panel.add(btnAdd, gbc);
         gbc.gridy++;
-        panel.add(btnAlter, gbc);
-        gbc.gridy++;
-        panel.add(btnRemove, gbc);
-        gbc.gridy++;
-        panel.add(btnPrint, gbc);
+        panel.add(btnFind, gbc);
         gbc.gridy++;
         panel.add(btnExit, gbc);
 
@@ -62,31 +55,55 @@ public class Main {
 
     private static void adicionarTarefa() {
         // Criação do JDialog personalizado para entrada de tarefas
-        JDialog dialog = new JDialog((Frame) null, "Adicionar Tarefa", true);
-        dialog.setSize(300, 150);
+        JFrame frame = new JFrame();
+        JDialog dialog = new JDialog(frame, "Adicionar Tarefa", true);
+        dialog.setSize(500, 300);
         dialog.setLayout(new BorderLayout());
-
+    
         // Campo de texto para entrada da descrição da tarefa
-        JTextField descricaoField = new JTextField(20);
+        JTextField descricaoField = new JTextField(30);
+        descricaoField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(Color.GRAY),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)));
         
         // Botões de confirmação e cancelamento
         JButton okButton = new JButton("OK");
+        okButton.setBackground(new Color(70, 130, 180));
+        okButton.setForeground(Color.WHITE);
+        
         JButton cancelButton = new JButton("Cancelar");
+        cancelButton.setBackground(new Color(220, 20, 60));
+        cancelButton.setForeground(Color.WHITE);
         
         // Painel de botões
-        JPanel buttonPanel = new JPanel();
+        JPanel buttonPanel = new JPanel(); 
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT, 10, 10));
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
-
-        // Painel de entrada
-        JPanel inputPanel = new JPanel();
-        inputPanel.add(new JLabel("Descrição da Tarefa:"));
-        inputPanel.add(descricaoField);
+    
+        // Painel de entrada com GridBagLayout para melhor alinhamento
+        JPanel inputPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        
+        JLabel descricaoLabel = new JLabel("Descrição da Tarefa:");
+        descricaoLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        inputPanel.add(descricaoLabel, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        inputPanel.add(descricaoField, gbc);
 
         // Adicionar painéis ao dialog
         dialog.add(inputPanel, BorderLayout.CENTER);
         dialog.add(buttonPanel, BorderLayout.SOUTH);
-
+    
         // Ação do botão OK
         okButton.addActionListener(e -> {
             String descricao = descricaoField.getText();
@@ -100,85 +117,34 @@ public class Main {
                 dialog.dispose();
             }
         });
-
+    
         // Ação do botão Cancelar
         cancelButton.addActionListener(e -> dialog.dispose());
-
+    
         // Tornar o dialog visível
-        dialog.setLocationRelativeTo(null);
+        dialog.setLocationRelativeTo(frame);
         dialog.setVisible(true);
-    }
+    }   
 
-    private static void alterarTarefa() {
-        JDialog dialog = new JDialog((Frame) null, "Alterar Tarefa", true);
-        dialog.setSize(300, 200);
-        dialog.setLayout(new BorderLayout());
+    private static void consultarTarefa() {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Consulta de Tarefas");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(400, 300);
 
-        // Campos de texto para entrada dos novos dados da tarefa
-        JTextField descricaoField = new JTextField(20);
-        JTextField prioridadeField = new JTextField(5);
-        JTextField dataConclusaoField = new JTextField(10);
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        // Botões de confirmação e cancelamento
-        JButton okButton = new JButton("OK");
-        JButton cancelButton = new JButton("Cancelar");
+            // Criação da tabela para exibir as tarefas
 
-        // Painel de botões
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(okButton);
-        buttonPanel.add(cancelButton);
-
-        // Painel de entrada
-        JPanel inputPanel = new JPanel(new GridLayout(4, 2, 5, 5));
-        inputPanel.add(new JLabel("Número da Tarefa:"));
-        JTextField numeroTarefaField = new JTextField(5); // Campo para inserir o número da tarefa
-        inputPanel.add(numeroTarefaField);
-        inputPanel.add(new JLabel("Nova Descrição da Tarefa:"));
-        inputPanel.add(descricaoField);
-        inputPanel.add(new JLabel("Nova Prioridade:"));
-        inputPanel.add(prioridadeField);
-        inputPanel.add(new JLabel("Nova Data de Conclusão (AAAA-MM-DD HH:mm:ss):"));
-        inputPanel.add(dataConclusaoField);
-
-        // Adicionar painéis ao dialog
-        dialog.add(inputPanel, BorderLayout.CENTER);
-        dialog.add(buttonPanel, BorderLayout.SOUTH);
-
-        // Ação do botão OK
-        okButton.addActionListener(e -> {
-            try {
-                int numeroDaTarefa = Integer.parseInt(numeroTarefaField.getText());
-                String novaDescricao = descricaoField.getText();
-                String novaDataConclusao = dataConclusaoField.getText();
-                Timestamp tsNovaDataConclusao = Timestamp.valueOf(novaDataConclusao);
-
-                Tarefa novaTarefa = new Tarefa(novaDescricao);
-                novaTarefa.setDataConclusao(tsNovaDataConclusao);
-
-                if (listaDeAfazeres.alterarTarefa(numeroDaTarefa, novaTarefa)) {
-                    JOptionPane.showMessageDialog(dialog, "Tarefa alterada com sucesso!");
-                } else {
-                    JOptionPane.showMessageDialog(dialog, "Erro ao alterar a tarefa.");
-                }
-                dialog.dispose();
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(dialog, "Por favor, insira dados válidos.");
-            } catch (IllegalArgumentException ex) {
-                JOptionPane.showMessageDialog(dialog, "Data de conclusão inválida.");
+            if (!ListaDeAfazeres.consultarTarefa(panel)) {
+                JOptionPane.showMessageDialog(frame, "Erro ao consultar tarefas.");
+            } else {
+                frame.add(panel);
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
             }
         });
-
-        // Ação do botão Cancelar
-        cancelButton.addActionListener(e -> dialog.dispose());
-
-        // Tornar o dialog visível
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
     }
 
-    private static void removerTarefa() {
-        // Implementação omitida para brevidade
-    }
-
-    // Outros métodos omitidos para brevidade
 }
