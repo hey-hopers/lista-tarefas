@@ -1,11 +1,7 @@
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.border.TitledBorder;
 
 import java.awt.*;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Vector;
 
 public class Main {
     private static ListaDeAfazeres listaDeAfazeres = new ListaDeAfazeres();
@@ -129,18 +125,37 @@ public class Main {
     private static void consultarTarefa() {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Consulta de Tarefas");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(400, 300);
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.setSize(1000, 600);
 
-            JPanel panel = new JPanel();
-            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            JPanel mainPanel = new JPanel(new BorderLayout());
+            mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Adiciona margem ao redor do painel principal
 
-            // Criação da tabela para exibir as tarefas
+            JPanel consultaPanel = new JPanel(new GridLayout(1, 3, 10, 0)); // Grid layout com 3 colunas
 
-            if (!ListaDeAfazeres.consultarTarefa(panel)) {
+            JPanel naoIniciadoPanel = new JPanel();
+            naoIniciadoPanel.setLayout(new BoxLayout(naoIniciadoPanel, BoxLayout.Y_AXIS));
+            naoIniciadoPanel.setBorder(new TitledBorder("Não iniciado"));
+
+            JPanel emProgressoPanel = new JPanel();
+            emProgressoPanel.setLayout(new BoxLayout(emProgressoPanel, BoxLayout.Y_AXIS));
+            emProgressoPanel.setBorder(new TitledBorder("Em progresso"));
+
+            JPanel concluidoPanel = new JPanel();
+            concluidoPanel.setLayout(new BoxLayout(concluidoPanel, BoxLayout.Y_AXIS));
+            concluidoPanel.setBorder(new TitledBorder("Concluído"));
+
+            consultaPanel.add(naoIniciadoPanel);
+            consultaPanel.add(emProgressoPanel);
+            consultaPanel.add(concluidoPanel);
+
+            JScrollPane scrollPane = new JScrollPane(consultaPanel);
+            mainPanel.add(scrollPane, BorderLayout.CENTER);
+
+            if (!listaDeAfazeres.consultarTarefa(naoIniciadoPanel, emProgressoPanel, concluidoPanel)) {
                 JOptionPane.showMessageDialog(frame, "Erro ao consultar tarefas.");
             } else {
-                frame.add(panel);
+                frame.add(mainPanel);
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
             }

@@ -1,13 +1,10 @@
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -224,53 +221,81 @@ public class ListaDeAfazeres {
         return nota[0];
     }
 
-    public static boolean consultarTarefa(JPanel panel) {
-        String sql = "SELECT TAR.descricao AS tarefa_descricao, PRI.descricao AS prioridade_descricao, TAR.data_criacao, TAR.data_conclusao, TAR.notas FROM TAREFA TAR INNER JOIN PRIORIDADE PRI ON TAR.prioridade_id = PRI.id";
+    public boolean consultarTarefa(JPanel naoIniciadoPanel, JPanel emProgressoPanel, JPanel concluidoPanel) {
+        String sql = "SELECT TAR.ID, TAR.DESCRICAO AS tarefa_descricao, PRI.DESCRICAO AS prioridade_descricao, STA.NOME AS status_descricao, TAR.DATA_CRIACAO, TAR.DATA_CONCLUSAO, TAR.NOTAS "
+                   + "FROM TAREFA TAR "
+                   + "INNER JOIN PRIORIDADE PRI ON TAR.PRIORIDADE_ID = PRI.ID "
+                   + "INNER JOIN STATUS STA ON TAR.STATUS_ID = STA.ID";
+
         boolean consultado = false;
 
         try (PreparedStatement stmt = conexao.prepararDeclaracao(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                JPanel taskPanel = new JPanel();
-                taskPanel.setLayout(new BoxLayout(taskPanel, BoxLayout.Y_AXIS));
+                int tarefaId = rs.getInt("TAR.ID");
+                String statusDescricao = rs.getString("status_descricao");
+
+                JPanel taskPanel = new JPanel(new BorderLayout());
                 taskPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
                 taskPanel.setBackground(new Color(240, 240, 240)); // Cor de fundo
                 taskPanel.setMaximumSize(new Dimension(350, 200)); // Tamanho máximo
 
+                JPanel textPanel = new JPanel();
+                textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+                textPanel.setOpaque(false);
+
                 JLabel descricaoValue = new JLabel(rs.getString("tarefa_descricao"));
                 descricaoValue.setFont(new Font("Arial", Font.BOLD, 18));
-                taskPanel.add(descricaoValue);
+                textPanel.add(descricaoValue);
 
                 // Adiciona espaço entre descrição e prioridade
-                taskPanel.add(Box.createVerticalStrut(10));
+                textPanel.add(Box.createVerticalStrut(10));
 
                 JLabel prioridadeValue = new JLabel(rs.getString("prioridade_descricao"));
                 prioridadeValue.setFont(new Font("Arial", Font.PLAIN, 14));
-                taskPanel.add(prioridadeValue);
+                textPanel.add(prioridadeValue);
 
                 JButton exibirButton = new JButton("Exibir");
-                taskPanel.add(exibirButton);
+                JButton removerButton = new JButton("Remover");
+
+                exibirButton.setPreferredSize(new Dimension(80, 25)); // Define o tamanho dos botões
+                removerButton.setPreferredSize(new Dimension(80, 25)); // Define o tamanho dos botões
+
+                JPanel buttonPanel = new JPanel();
+                buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+                buttonPanel.setOpaque(false);
+
+                buttonPanel.add(exibirButton);
+                buttonPanel.add(Box.createVerticalStrut(5)); // Espaçamento vertical entre botões
+                buttonPanel.add(removerButton);
 
                 JPanel detailsPanel = new JPanel();
                 detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
                 detailsPanel.setVisible(false);
 
-                StringBuilder datas_inicio = new StringBuilder();
+                JLabel data = new JLabel("Datas");
+                data.setFont(new Font("Arial", Font.BOLD, 14));
+                detailsPanel.add(data);
 
-                datas_inicio.append("Início: ").append(rs.getString("data_criacao")).append("  ");                
-                JLabel dataCriacao = new JLabel(datas_inicio.toString());
-                dataCriacao.setLayout(new BoxLayout(dataCriacao, BoxLayout.Y_AXIS));
-                dataCriacao.setVisible(false);
+                StringBuilder datasInicio = new StringBuilder();
+                datasInicio.append("Início: ").append(rs.getString("DATA_CRIACAO")).append("  ");
 
-                StringBuilder datas_fim = new StringBuilder();
+                JLabel dataCriacao = new JLabel(datasInicio.toString());
+                dataCriacao.setFont(new Font("Arial", Font.PLAIN, 14));
+                detailsPanel.add(dataCriacao);
 
-                datas_fim.append("Início: ").append(rs.getString("data_criacao")).append("  ");
-                JLabel dataConclusao= new JLabel(datas_fim.toString());
-                dataConclusao.setLayout(new BoxLayout(dataConclusao, BoxLayout.Y_AXIS));
-                dataConclusao.setVisible(false);
+                StringBuilder datasFim = new StringBuilder();
+                datasFim.append("Fim: ").append(rs.getString("DATA_CONCLUSAO")).append("  ");
 
-                String nota = rs.getString("notas");
+                JLabel dataConclusao = new JLabel(datasFim.toString());
+                dataConclusao.setFont(new Font("Arial", Font.PLAIN, 14));
+                detailsPanel.add(dataConclusao);
+
+                // Adiciona espaço entre descrição e prioridade
+                detailsPanel.add(Box.createVerticalStrut(10));
+
+                String nota = rs.getString("NOTAS");
                 if (nota != null) {
                     JLabel notaLabel = new JLabel("Nota:");
                     notaLabel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -283,25 +308,68 @@ public class ListaDeAfazeres {
                 exibirButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        dataCriacao.setVisible(!dataCriacao.isVisible());
-                        dataConclusao.setVisible(!dataConclusao.isVisible());
                         detailsPanel.setVisible(!detailsPanel.isVisible());
                         exibirButton.setText(detailsPanel.isVisible() ? "Ocultar" : "Exibir");
                     }
                 });
 
-                taskPanel.add(detailsPanel);
-                panel.add(Box.createVerticalStrut(10)); // Espaçamento vertical entre os painéis de tarefa
-                panel.add(taskPanel);
+                removerButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        int opcao = JOptionPane.showConfirmDialog(
+                            null,
+                            "Tem certeza que deseja remover esta tarefa?",
+                            "Confirmação",
+                            JOptionPane.YES_NO_OPTION
+                        );
 
-                consultado = true;
+                        if (opcao == JOptionPane.YES_OPTION) {
+                            removerTarefa(tarefaId);
+                            Container parent = taskPanel.getParent();
+                            parent.remove(taskPanel);
+                            parent.revalidate();
+                            parent.repaint();
+                        }
+                    }
+                });
+
+                taskPanel.add(textPanel, BorderLayout.CENTER);
+                taskPanel.add(buttonPanel, BorderLayout.EAST);
+                taskPanel.add(detailsPanel, BorderLayout.SOUTH);
+
+                switch (statusDescricao) {
+                    case "Não iniciado":
+                        naoIniciadoPanel.add(taskPanel);
+                        break;
+                    case "Em progresso":
+                        emProgressoPanel.add(taskPanel);
+                        break;
+                    case "Concluído":
+                        concluidoPanel.add(taskPanel);
+                        break;
+                    default:
+                        throw new IllegalStateException("Status desconhecido: " + statusDescricao);
+                }
             }
+            consultado = true;
 
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Erro ao consultar tarefas: " + e.getMessage());
         }
 
         return consultado;
+    }
+
+    private void removerTarefa(int tarefaId) {
+        String sql = "DELETE FROM TAREFA WHERE ID = ?";
+
+        try (PreparedStatement stmt = conexao.prepararDeclaracao(sql)) {
+            stmt.setInt(1, tarefaId);
+            stmt.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Tarefa removida com sucesso.");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao remover tarefa: " + e.getMessage());
+        }
     }
 
 }
