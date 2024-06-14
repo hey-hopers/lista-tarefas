@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ActionEvent;
@@ -234,7 +235,10 @@ public class ListaDeAfazeres {
 
             while (rs.next()) {
                 int tarefaId = rs.getInt("TAR.ID");
-                String statusDescricao = rs.getString("status_descricao");
+                String statusDescricao = rs.getString("status_descricao").trim().toLowerCase();
+
+                // Log do status para depuração
+                System.out.println("Status da tarefa: " + statusDescricao);
 
                 JPanel taskPanel = new JPanel(new BorderLayout());
                 taskPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
@@ -257,9 +261,11 @@ public class ListaDeAfazeres {
                 textPanel.add(prioridadeValue);
 
                 JButton exibirButton = new JButton("Exibir");
+                JButton alterarButton = new JButton("Alterar");
                 JButton removerButton = new JButton("Remover");
 
                 exibirButton.setPreferredSize(new Dimension(80, 25)); // Define o tamanho dos botões
+                alterarButton.setPreferredSize(new Dimension(80, 25)); // Define o tamanho dos botões
                 removerButton.setPreferredSize(new Dimension(80, 25)); // Define o tamanho dos botões
 
                 JPanel buttonPanel = new JPanel();
@@ -267,6 +273,8 @@ public class ListaDeAfazeres {
                 buttonPanel.setOpaque(false);
 
                 buttonPanel.add(exibirButton);
+                buttonPanel.add(Box.createVerticalStrut(5)); // Espaçamento vertical entre botões
+                buttonPanel.add(alterarButton);
                 buttonPanel.add(Box.createVerticalStrut(5)); // Espaçamento vertical entre botões
                 buttonPanel.add(removerButton);
 
@@ -313,6 +321,13 @@ public class ListaDeAfazeres {
                     }
                 });
 
+                alterarButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        editarTarefa(tarefaId);
+                    }
+                });
+
                 removerButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -338,13 +353,18 @@ public class ListaDeAfazeres {
                 taskPanel.add(detailsPanel, BorderLayout.SOUTH);
 
                 switch (statusDescricao) {
-                    case "Não iniciado":
+                    case "não iniciado":
+                    case "não_iniciado":
+                    case "nao iniciado":
+                    case "nao_iniciado":
                         naoIniciadoPanel.add(taskPanel);
                         break;
-                    case "Em progresso":
+                    case "em progresso":
+                    case "em_progresso":
                         emProgressoPanel.add(taskPanel);
                         break;
-                    case "Concluído":
+                    case "concluído":
+                    case "concluido":
                         concluidoPanel.add(taskPanel);
                         break;
                     default:
@@ -369,6 +389,90 @@ public class ListaDeAfazeres {
             JOptionPane.showMessageDialog(null, "Tarefa removida com sucesso.");
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Erro ao remover tarefa: " + e.getMessage());
+        }
+    }
+
+    private void editarTarefa(int tarefaId) {
+        // Diálogo para editar tarefa
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        JTextField descricaoField = new JTextField(20);
+        JComboBox<String> prioridadeComboBox = new JComboBox<>(new String[]{"Baixa", "Média", "Alta"});
+        JTextField dataConclusaoField = new JTextField(20);
+        JComboBox<String> statusComboBox = new JComboBox<>(new String[]{"Não iniciado", "Em progresso", "Concluído"});
+        JTextArea notaTextArea = new JTextArea(5, 20);
+        JScrollPane notaScrollPane = new JScrollPane(notaTextArea);
+        panel.add(new JLabel("Descrição:"));
+        panel.add(descricaoField);
+        panel.add(new JLabel("Prioridade:"));
+        panel.add(prioridadeComboBox);
+        panel.add(new JLabel("Data de Conclusão (AAAA-MM-DD HH:MM:SS):"));
+        panel.add(dataConclusaoField);
+        panel.add(new JLabel("Status:"));
+        panel.add(statusComboBox);
+        panel.add(new JLabel("Nota:"));
+        panel.add(notaScrollPane);
+
+        // Obter informações da tarefa do banco de dados
+        String selectSql = "SELECT DESCRICAO, PRIORIDADE_ID, DATA_CONCLUSAO, STATUS_ID, NOTAS FROM TAREFA WHERE ID=?";
+        try (PreparedStatement stmt = conexao.prepararDeclaracao(selectSql)) {
+            stmt.setInt(1, tarefaId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                descricaoField.setText(rs.getString("DESCRICAO"));
+                prioridadeComboBox.setSelectedIndex(rs.getInt("PRIORIDADE_ID") - 1);
+                dataConclusaoField.setText(rs.getTimestamp("DATA_CONCLUSAO").toLocalDateTime().toString());
+                statusComboBox.setSelectedIndex(rs.getInt("STATUS_ID") - 1);
+                notaTextArea.setText(rs.getString("NOTAS"));
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Erro ao obter informações da tarefa: " + ex.getMessage());
+            return;
+        }
+
+        int result = JOptionPane.showConfirmDialog(null, panel, "Editar Tarefa",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            // Atualizar os dados da tarefa no banco de dados
+            String descricao = descricaoField.getText();
+            String prioridade = (String) prioridadeComboBox.getSelectedItem();
+            String dataConclusao = dataConclusaoField.getText().trim(); // Remover espaços extras
+            String status = (String) statusComboBox.getSelectedItem();
+            String notaAtualizada = notaTextArea.getText();
+
+            // Conversão da prioridade para ID
+            int prioridadeId = prioridadeComboBox.getSelectedIndex() + 1;
+
+            // Conversão do status para ID
+            int statusId = statusComboBox.getSelectedIndex() + 1;
+
+            // Formatar a data de conclusão
+            LocalDateTime dataConclusaoFormatada;
+            try {
+                dataConclusaoFormatada = LocalDateTime.parse(dataConclusao);
+            } catch (DateTimeParseException ex) {
+                JOptionPane.showMessageDialog(null, "Formato de data inválido. Use o formato: AAAA-MM-DD HH:MM:SS");
+                return;
+            }
+
+            // Atualizar os dados no banco de dados
+            String updateSql = "UPDATE TAREFA SET DESCRICAO=?, PRIORIDADE_ID=?, STATUS_ID=?, DATA_CONCLUSAO=?, NOTAS=? WHERE ID=?";
+            try (PreparedStatement stmt = conexao.prepararDeclaracao(updateSql)) {
+                stmt.setString(1, descricao);
+                stmt.setInt(2, prioridadeId);
+                stmt.setInt(3, statusId);
+                stmt.setTimestamp(4, Timestamp.valueOf(dataConclusaoFormatada));
+                stmt.setString(5, notaAtualizada);
+                stmt.setInt(6, tarefaId);
+
+                int linhasAfetadas = stmt.executeUpdate();
+                if (linhasAfetadas > 0) {
+                    JOptionPane.showMessageDialog(null, "Tarefa atualizada com sucesso.");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Erro ao atualizar tarefa.");
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Erro ao atualizar tarefa: " + ex.getMessage());
+            }
         }
     }
 

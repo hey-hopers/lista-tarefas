@@ -10,7 +10,7 @@ public class Main {
         // Criar a janela principal
         JFrame frame = new JFrame("Lista de Tarefas");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(500, 400);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 
         // Criar o painel principal com GridBagLayout
         JPanel panel = new JPanel(new GridBagLayout());
@@ -54,7 +54,7 @@ public class Main {
         JFrame frame = new JFrame();
         JDialog dialog = new JDialog(frame, "Adicionar Tarefa", true);
         dialog.setSize(500, 300);
-        dialog.setLayout(new BorderLayout());
+        dialog.setLocationRelativeTo(frame);
     
         // Campo de texto para entrada da descrição da tarefa
         JTextField descricaoField = new JTextField(30);
