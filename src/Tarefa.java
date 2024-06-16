@@ -1,40 +1,57 @@
+import java.sql.Timestamp;
+
 public class Tarefa {
     private int id;
+    private int status_id;
     private String descricao;
-    private boolean concluido;
+    private Timestamp dataConclusao;
 
-    // Construtor que aceita apenas a descrição da tarefa
     public Tarefa(String descricao) {
         this.descricao = descricao;
-        this.concluido = false; // Por padrão, uma nova tarefa não está concluída
+        this.status_id = 1; // Por padrão, uma nova tarefa não está concluída
     }
+
+    // Getters e setters para os campos id, status_id, descricao e prioridade
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getStatus() {
+        return status_id;
+    }
+
+    public void setStatus(int status_id) {
+        this.status_id = status_id;
     }
 
     public String getDescricao() {
         return descricao;
     }
 
-    public boolean estaConcluido() {
-        return concluido;
-    }
-
     public void setDescricao(String descricao) {
         this.descricao = descricao;
     }
 
-    public void setConcluido(boolean concluido) {
-        this.concluido = concluido;
+    public Timestamp getDataConclusao() {
+        return dataConclusao;
+    }
+
+    public void setDataConclusao(Timestamp dataConclusao) {
+        this.dataConclusao = dataConclusao;
     }
 
     @Override
     public String toString() {
         return "Tarefa{" +
                 "id=" + id +
+                ", status_id=" + status_id +
                 ", descricao='" + descricao + '\'' +
-                ", concluido=" + concluido +
+                ", dataConclusao=" + dataConclusao +
                 '}';
     }
 }
