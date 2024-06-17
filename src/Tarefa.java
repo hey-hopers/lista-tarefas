@@ -1,32 +1,42 @@
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class Tarefa {
     private int id;
-    private int status_id;
     private String descricao;
-    private Timestamp dataConclusao;
+    private int prioridade;
+    private int status;
+    private LocalDateTime dataCriacao;
+    private LocalDateTime dataConclusao;
+    private String nota;
 
-    public Tarefa(String descricao) {
+    // Construtor
+    public Tarefa(String descricao, int prioridade, int status, LocalDateTime dataCriacao, LocalDateTime dataConclusao, String nota) {
         this.descricao = descricao;
-        this.status_id = 1; // Por padrão, uma nova tarefa não está concluída
+        this.prioridade = prioridade;
+        this.status = status;
+        this.dataCriacao = dataCriacao;
+        this.dataConclusao = dataConclusao;
+        this.nota = nota;
     }
 
-    // Getters e setters para os campos id, status_id, descricao e prioridade
+    // Construtor com ID
+    public Tarefa(int id, String descricao, int prioridade, int status, LocalDateTime dataCriacao, LocalDateTime dataConclusao, String nota) {
+        this.id = id;
+        this.descricao = descricao;
+        this.prioridade = prioridade;
+        this.status = status;
+        this.dataCriacao = dataCriacao;
+        this.dataConclusao = dataConclusao;
+        this.nota = nota;
+    }
 
+    // Getters e Setters
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getStatus() {
-        return status_id;
-    }
-
-    public void setStatus(int status_id) {
-        this.status_id = status_id;
     }
 
     public String getDescricao() {
@@ -37,21 +47,43 @@ public class Tarefa {
         this.descricao = descricao;
     }
 
-    public Timestamp getDataConclusao() {
+    public int getPrioridade() {
+        return prioridade;
+    }
+
+    public void setPrioridade(int prioridade) {
+        this.prioridade = prioridade;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getDataCriacao() {
+        return dataCriacao;
+    }
+
+    public void setDataCriacao(LocalDateTime dataCriacao) {
+        this.dataCriacao = dataCriacao;
+    }
+
+    public LocalDateTime getDataConclusao() {
         return dataConclusao;
     }
 
-    public void setDataConclusao(Timestamp dataConclusao) {
+    public void setDataConclusao(LocalDateTime dataConclusao) {
         this.dataConclusao = dataConclusao;
     }
 
-    @Override
-    public String toString() {
-        return "Tarefa{" +
-                "id=" + id +
-                ", status_id=" + status_id +
-                ", descricao='" + descricao + '\'' +
-                ", dataConclusao=" + dataConclusao +
-                '}';
+    public String getNota() {
+        return nota;
+    }
+
+    public void setNota(String nota) {
+        this.nota = nota;
     }
 }

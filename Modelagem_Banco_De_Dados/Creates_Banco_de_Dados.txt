@@ -1,0 +1,23 @@
+CREATE TABLE Tarefa (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    prioridade_id INT NOT NULL,
+    status_id INT NOT NULL,
+    data_criacao DATETIME NOT NULL,
+    data_conclusao DATETIME,
+    notas TEXT,
+    CONSTRAINT fk_prioridade FOREIGN KEY (prioridade_id) REFERENCES Prioridade(id),
+    CONSTRAINT fk_status FOREIGN KEY (status_id) REFERENCES Status(id)
+);
+
+CREATE TABLE Prioridade (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    descricao TEXT
+);
+
+CREATE TABLE Status (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    descricao TEXT
+);

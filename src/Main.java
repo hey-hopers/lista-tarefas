@@ -2,47 +2,33 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Main {
-    private JFrame frame;
-    private JTabbedPane tabbedPane;
+    private static ListaDeAfazeres listaDeAfazeres = new ListaDeAfazeres();
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(Main::new);
-    }
-
-    public Main() {
-        createAndShowGUI();
-    }
-
-    private void createAndShowGUI() {
-        frame = new JFrame("Sistema de Tarefas");
+        JFrame frame = new JFrame("Lista de Tarefas");
+        ImageIcon icon = new ImageIcon("img/favicon.ico");
+        
+        // Definindo o ícone para o JFrame
+        frame.setIconImage(icon.getImage());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
-        frame.setLocationRelativeTo(null);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-        // Configurar o JTabbedPane
-        tabbedPane = new JTabbedPane();
+        // Crie um JTabbedPane
+        JTabbedPane tabbedPane = new JTabbedPane();
 
-        // Adicionar o MenuPanel
-        MenuPanel menuPanel = new MenuPanel(this);
-        frame.add(menuPanel, BorderLayout.CENTER);
+        // Adicione o JTabbedPane ao JFrame
+        frame.add(tabbedPane);
+
+        // Adicione as abas
+        adicionarMenu(tabbedPane, listaDeAfazeres);
 
         frame.setVisible(true);
     }
 
-    public void adicionarAbaConsultar() {
-        ListaDeAfazeres listaDeAfazeres = new ListaDeAfazeres();  // Certifique-se de inicializar corretamente sua lista
-        ConsultarPanel consultarPanel = new ConsultarPanel(listaDeAfazeres);
-        tabbedPane.addTab("Consultar", consultarPanel);
-        frame.add(tabbedPane, BorderLayout.CENTER);
-        frame.revalidate();
-        frame.repaint();
-    }
-
-    public void adicionarAbaAdicionar() {
-        AdicionarPanel adicionarPanel = new AdicionarPanel();
-        tabbedPane.addTab("Adicionar", adicionarPanel);
-        frame.add(tabbedPane, BorderLayout.CENTER);
-        frame.revalidate();
-        frame.repaint();
+    private static void adicionarMenu(JTabbedPane tabbedPane, ListaDeAfazeres listaDeAfazeres) {
+        // Painel de menu principal
+        JPanel menuPanel = new MenuPanel(tabbedPane, listaDeAfazeres);
+        tabbedPane.addTab("Menu Principal", menuPanel);
+        
     }
 }
