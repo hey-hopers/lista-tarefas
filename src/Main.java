@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.awt.*;
 
 public class Main {
     private static ListaDeAfazeres listaDeAfazeres = new ListaDeAfazeres();
