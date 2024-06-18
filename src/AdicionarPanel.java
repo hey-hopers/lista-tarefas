@@ -3,7 +3,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -16,6 +15,7 @@ public class AdicionarPanel extends JPanel {
     public AdicionarPanel(ListaDeAfazeres listaDeAfazeres) {
         this.listaDeAfazeres = listaDeAfazeres;
         this.dataHoraInicio = LocalDateTime.now();
+        setBackground(new Color(200, 200, 200));
         initComponents();
     }
 
@@ -54,6 +54,7 @@ public class AdicionarPanel extends JPanel {
         JSpinner hora_conclusao = CustomizarHora();      
     
         JPanel data_conclusao_panel = new JPanel(new GridBagLayout());
+        data_conclusao_panel.setBackground(new Color(200, 200, 200));
         GridBagConstraints lay_conclusao = new GridBagConstraints();
         lay_conclusao.insets = new Insets(0, 0, 0, 10);
     
