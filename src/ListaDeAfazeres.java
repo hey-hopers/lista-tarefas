@@ -14,10 +14,10 @@ public class ListaDeAfazeres {
 
     // Adicionar Tarefa
     public boolean adicionarTarefa(Tarefa tarefa) {
-        String sql = "INSERT INTO tarefa (descricao, prioridade_id, status_id, data_criacao, data_conclusao, notas) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO tarefa (titulo, prioridade_id, status_id, data_criacao, data_conclusao, notas) VALUES (?, ?, ?, ?, ?, ?)";
     
         try (PreparedStatement stmt = conexao.prepararDeclaracao(sql)) {
-            stmt.setString(1, tarefa.getDescricao());
+            stmt.setString(1, tarefa.getTitulo());
             stmt.setInt(2, tarefa.getPrioridade());
             stmt.setInt(3, tarefa.getStatus());
             stmt.setTimestamp(4, Timestamp.valueOf(tarefa.getDataCriacao()));
@@ -34,7 +34,7 @@ public class ListaDeAfazeres {
 
     // Consultar tarefa
     public List<Tarefa> consultarTarefas() {
-        String sql = "SELECT TAR.ID, TAR.DESCRICAO AS tarefa_descricao, PRI.ID AS prioridade_id, STA.ID AS status_id, TAR.DATA_CRIACAO, TAR.DATA_CONCLUSAO, TAR.NOTAS "
+        String sql = "SELECT TAR.ID, TAR.TITULO AS tarefa_titulo, PRI.ID AS prioridade_id, PRI.NOME AS prioridade_nome, STA.ID AS status_id, STA.NOME AS status_nome, TAR.DATA_CRIACAO, TAR.DATA_CONCLUSAO, TAR.NOTAS "
                    + "FROM TAREFA TAR "
                    + "INNER JOIN PRIORIDADE PRI ON TAR.PRIORIDADE_ID = PRI.ID "
                    + "INNER JOIN STATUS STA ON TAR.STATUS_ID = STA.ID";
@@ -46,14 +46,16 @@ public class ListaDeAfazeres {
 
             while (rs.next()) {
                 int id = rs.getInt("ID");
-                String descricao = rs.getString("tarefa_descricao");
+                String descricao = rs.getString("tarefa_titulo");
                 int prioridade = rs.getInt("prioridade_id");
+                String nomePrioridade = rs.getString("prioridade_nome");
                 int status = rs.getInt("status_id");
+                String nomeStatus = rs.getString("status_nome");
                 LocalDateTime dataCriacao = rs.getTimestamp("DATA_CRIACAO").toLocalDateTime();
                 LocalDateTime dataConclusao = rs.getTimestamp("DATA_CONCLUSAO") != null ? rs.getTimestamp("DATA_CONCLUSAO").toLocalDateTime() : null;
                 String notas = rs.getString("NOTAS");
 
-                Tarefa tarefa = new Tarefa(id, descricao, prioridade, status, dataCriacao, dataConclusao, notas);
+                Tarefa tarefa = new Tarefa(id, descricao, prioridade, nomePrioridade, status, nomeStatus, dataCriacao, dataConclusao, notas);
                 tarefas.add(tarefa);
             }
 
@@ -65,10 +67,10 @@ public class ListaDeAfazeres {
     }
 
     // Atualizar os dados no banco de dados
-    public boolean alterarTarefas(String descricao, int prioridadeId, int statusId, Timestamp dataConclusaoFormatada, String notaAtualizada, int tarefaId) {
-        String updateSql = "UPDATE TAREFA SET DESCRICAO=?, PRIORIDADE_ID=?, STATUS_ID=?, DATA_CONCLUSAO=?, NOTAS=? WHERE ID=?";
+    public boolean alterarTarefas(String titulo, int prioridadeId, int statusId, Timestamp dataConclusaoFormatada, String notaAtualizada, int tarefaId) {
+        String updateSql = "UPDATE TAREFA SET TITULO=?, PRIORIDADE_ID=?, STATUS_ID=?, DATA_CONCLUSAO=?, NOTAS=? WHERE ID=?";
         try (PreparedStatement stmt = conexao.prepararDeclaracao(updateSql)) {
-            stmt.setString(1, descricao);
+            stmt.setString(1, titulo);
             stmt.setInt(2, prioridadeId);
             stmt.setInt(3, statusId);
             stmt.setTimestamp(4, dataConclusaoFormatada);
@@ -107,4 +109,5 @@ public class ListaDeAfazeres {
             return false;
         }
     }
+    
 }

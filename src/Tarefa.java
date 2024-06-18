@@ -2,16 +2,18 @@ import java.time.LocalDateTime;
 
 public class Tarefa {
     private int id;
-    private String descricao;
+    private String titulo;
     private int prioridade;
+    private String nomePrioridade;
     private int status;
+    private String nomeStatus;
     private LocalDateTime dataCriacao;
     private LocalDateTime dataConclusao;
     private String nota;
 
     // Construtor
-    public Tarefa(String descricao, int prioridade, int status, LocalDateTime dataCriacao, LocalDateTime dataConclusao, String nota) {
-        this.descricao = descricao;
+    public Tarefa(String titulo, int prioridade, int status, LocalDateTime dataCriacao, LocalDateTime dataConclusao, String nota) {
+        this.titulo = titulo;
         this.prioridade = prioridade;
         this.status = status;
         this.dataCriacao = dataCriacao;
@@ -20,11 +22,13 @@ public class Tarefa {
     }
 
     // Construtor com ID
-    public Tarefa(int id, String descricao, int prioridade, int status, LocalDateTime dataCriacao, LocalDateTime dataConclusao, String nota) {
+    public Tarefa(int id, String titulo, int prioridade, String nomePrioridade, int status, String nomeStatus, LocalDateTime dataCriacao, LocalDateTime dataConclusao, String nota) {
         this.id = id;
-        this.descricao = descricao;
+        this.titulo = titulo;
         this.prioridade = prioridade;
+        this.nomePrioridade = nomePrioridade;
         this.status = status;
+        this.nomeStatus = nomeStatus;
         this.dataCriacao = dataCriacao;
         this.dataConclusao = dataConclusao;
         this.nota = nota;
@@ -39,12 +43,12 @@ public class Tarefa {
         this.id = id;
     }
 
-    public String getDescricao() {
-        return descricao;
+    public String getTitulo() {
+        return titulo;
     }
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
     }
 
     public int getPrioridade() {
@@ -55,12 +59,28 @@ public class Tarefa {
         this.prioridade = prioridade;
     }
 
+    public String getnomePrioridade() {
+        return nomePrioridade;
+    }
+
+    public void setnomePrioridade(String nomePrioridade) {
+        this.nomePrioridade = nomePrioridade;
+    }
+
     public int getStatus() {
         return status;
     }
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getnomeStatus() {
+        return nomeStatus;
+    }
+
+    public void setnomeStatus(String nomeStatus) {
+        this.nomeStatus = nomeStatus;
     }
 
     public LocalDateTime getDataCriacao() {

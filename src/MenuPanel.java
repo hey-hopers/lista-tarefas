@@ -8,6 +8,7 @@ public class MenuPanel extends JPanel {
     public MenuPanel(JTabbedPane tabbedPane, ListaDeAfazeres listaDeAfazeres) {
         this.tabbedPane = tabbedPane;
         this.listaDeAfazeres = listaDeAfazeres;
+        setBackground(new Color(200, 200, 200));
         initComponents();
     }
 
@@ -16,32 +17,47 @@ public class MenuPanel extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.weighty = 0.5;
+        gbc.anchor = GridBagConstraints.CENTER;
 
         // Adicionando imagem
-        ImageIcon imagem_menu = new ImageIcon("img/banner.jpg");
+        ImageIcon imagem_menu = new ImageIcon("img/banner-Teste.png");
         JLabel Jimagem = new JLabel(imagem_menu);
+        gbc.insets = new Insets(100, 115, 0, 0);
         add(Jimagem, gbc);
 
         // Painel para os botões
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.setBackground(new Color(200, 200, 200));
+        Dimension buttonSize = new Dimension(200, 40);
 
-        JButton btnAdicionarTarefa = new JButton("Adicionar Tarefa");
-        btnAdicionarTarefa.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JButton btnAdicionarTarefa = new JButton("Adicionar Tarefas");
+        btnAdicionarTarefa.setFont(new Font("Arial", Font.BOLD, 16));
+        btnAdicionarTarefa.setBackground(new Color(245, 245, 245));
+        btnAdicionarTarefa.setAlignmentX(Component.CENTER_ALIGNMENT); 
+        btnAdicionarTarefa.setPreferredSize(buttonSize);
+        btnAdicionarTarefa.setMinimumSize(buttonSize);
+        btnAdicionarTarefa.setMaximumSize(buttonSize);
+
         btnAdicionarTarefa.addActionListener(e -> {
-            if (!isTabOpen("Adicionar Tarefa")) {
+            if (!isTabOpen("Adicionar Tarefas")) {
                 JPanel adicionarPanel = new AdicionarPanel(listaDeAfazeres);
-                addTabWithCloseButton("Adicionar Tarefa", adicionarPanel);
+                addTabWithCloseButton("Adicionar Tarefas", adicionarPanel);
                 tabbedPane.setSelectedComponent(adicionarPanel); 
             } else {
-                tabbedPane.setSelectedIndex(getTabIndex("Adicionar Tarefa"));
+                tabbedPane.setSelectedIndex(getTabIndex("Adicionar Tarefas"));
             }
         });
 
         JButton btnConsultarTarefas = new JButton("Consultar Tarefas");
+        btnConsultarTarefas.setFont(new Font("Arial", Font.BOLD, 16));
+        btnConsultarTarefas.setBackground(new Color(245, 245, 245));
         btnConsultarTarefas.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnConsultarTarefas.setPreferredSize(buttonSize);
+        btnConsultarTarefas.setMinimumSize(buttonSize);
+        btnConsultarTarefas.setMaximumSize(buttonSize);
+
         btnConsultarTarefas.addActionListener(e -> {
             if (!isTabOpen("Consultar Tarefas")) {
                 JPanel consultarPanel = new ConsultarPanel(listaDeAfazeres);
@@ -52,6 +68,7 @@ public class MenuPanel extends JPanel {
             }
         });
 
+        gbc.insets = new Insets(0, 0, 270, 0);
         buttonPanel.add(Box.createVerticalGlue()); // Coloca os botões no centro verticalmente
         buttonPanel.add(btnAdicionarTarefa);
         buttonPanel.add(Box.createVerticalStrut(10)); // Espaço entre os botões
@@ -100,24 +117,11 @@ public class MenuPanel extends JPanel {
                 g.drawLine(width - 3, 2, 2, height - 3);
             }
         };
-        button.setPreferredSize(new Dimension(17, 17));
+        button.setPreferredSize(new Dimension(15, 15));
         button.setContentAreaFilled(false);
         button.setFocusable(false);
         button.setBorder(BorderFactory.createEmptyBorder());
         button.setBorderPainted(false);
-
-        // Mudar cor ao passar o mouse
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
-                button.setForeground(Color.RED);
-            }
-
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
-                button.setForeground(Color.BLACK);
-            }
-        });
 
         return button;
     }
